@@ -16,11 +16,6 @@ def start(update, context):
 start_handler = CommandHandler('start', start)
 dispatcher.add_handler(start_handler)
 
-@app.route('/')
-def hello():
-    updater.start_polling()
-    return "Hello World!"
-
 if __name__ == '__main__':
     updater.start_polling()
     app.run()
