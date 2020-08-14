@@ -4,6 +4,7 @@ from config import Config
 from karma import Karma
 import redis
 import json
+import random
 
 app = Flask(__name__)
 
@@ -20,18 +21,41 @@ def quote(update, context):
     args = context.args
     if args[0] in params:
         if args[0].lower() == "add":
-            list = update.message.text.split(" ")[2:]
-            if len(list) < 3:
+            parameters = update.message.text.split(" ")[2:]
+            if len(parameters) < 3:
                 context.bot.send_message(chat_id=update.effective_chat.id, text="Add Quote Format: /q add USERNAME QUOTE")
             else:
-                username = list[0]
-                quotation = json.dumps(" ".join(list[1:]))
-                print(f"user:{username}")
-                if r.exists(f"user:{username}") != 0:
+                username = parameters[0]
+                quotation = " ".join(parameters[1:])
+                if r.exists(f"user:{username}") == 0:
+                    quotation = json.dumps(quotation)
                     r.hset(f"user:{username}", "quotes", quotation)
-                    i = 1
-                    i += 1
+                else:
+                    uquotes = r.hget(f"user:{username}", "quotes")
+                    if '[' in uquotes:
+                        uquotes = json.loads(uquotes)
+                    if isinstance(uquotes, list):
+                        uquotes.append(quotation)
+                        uquotes = json.dumps(uquotes)
+                        r.hset(f"user:{username}", "quotes", uquotes)
+                        print(uquotes)
+                    else:
+                        newList = [uquotes, quotation]
+                        newList = json.dumps(newList)
+                        r.hset(f"user:{username}", "quotes", newList)
+                print(r.hget(f"user:{username}", "quotes"))
                 context.bot.send_message(chat_id=update.effective_chat.id, text='"'+quotation+'" added to '+username+'\'s quotes!')
+    elif r.exists(f"user:{args[0]}") != 0:
+        uquotes = r.hget(f"user:{args[0]}", "quotes")
+        print(uquotes)
+        if '[' in uquotes:
+            uquotes = json.loads(uquotes)
+            size = len(uquotes)
+            index = random.randint(0, size-1)
+            uquotes = uquotes[index]
+            context.bot.send_message(chat_id=update.effective_chat.id, text=f"{args[0]} : {uquotes}")
+        else:
+            context.bot.send_message(chat_id=update.effective_chat.id, text=f"{args[0]} : {uquotes}")
     else:
         context.bot.send_message(chat_id=update.effective_chat.id, text="Second parameter looks dodgy there pal <.<")
 
