@@ -20,6 +20,6 @@ class Karma:
             self.set_karma(user, -1)
         else:
             user = string.split(" ")[1]
-            self.set_karma(user, 0);
+            self.set_karma(user, 0)
         karma = self.db.get(user) 
         bot.send_message(chat_id=chat.id, text=user+" has "+karma+" karma")

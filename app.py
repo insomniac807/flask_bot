@@ -29,7 +29,7 @@ dispatcher.add_handler(quote_handler)
 def parse_incoming_message(update, context):
     if "++" in update.message.text or "—" in update.message.text or update.message.text.split(" ")[0] == "karma":
         karma = Karma(r)
-        karma.handle_karma(update.message.text, update.effective_chat, context.bot)
+        karma.handle_karma(update.message.text.lower(), update.effective_chat, context.bot)
 
 
 messageParse_handler = MessageHandler(Filters.text & (~Filters.command), parse_incoming_message)
