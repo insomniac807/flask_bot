@@ -18,7 +18,14 @@ def quote(update, context):
     params = ["add", "search", "delete", "rmlast"]
     args = context.args
     if args[0] in params:
-        print(args)
+        if args[0].lower() == "add":
+            list = update.message.text.split(" ")[2:]
+            if len(list) < 3:
+                context.bot.send_message(chat_id=update.effective_chat.id, text="Add Quote Format: /q add USERNAME QUOTE")
+            else:
+                username = list[0]
+                quote = " ".join(list[1:])
+                context.bot.send_message(chat_id=update.effective_chat.id, text='"'+quote+'" added to '+username+'\'s quotes!')
     else:
         context.bot.send_message(chat_id=update.effective_chat.id, text="Second parameter looks dodgy there pal <.<")
 
