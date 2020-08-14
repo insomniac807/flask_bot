@@ -3,12 +3,12 @@ class Karma:
         self.db = db
 
     def set_karma(self, user, value):
-        if self.db.exists(user) == 0:
-            self.db.set(user, value)
+        if self.db.exists(f"user:{user}") == 0:
+            self.db.hset(f"user:{user}", "karma", value)
         else:
-            karma = int(self.db.get(user))
-            karma = karma + value
-            self.db.set(user, karma)
+            karma = int(self.db.hget(f"user:{user}", "karma"))
+            karma = int(karma) + value
+            self.db.hset(f"user:{user}", "karma", str(karma))
 
 
     def handle_karma(self, string, chat, bot):
@@ -21,5 +21,5 @@ class Karma:
         else:
             user = string.split(" ")[1]
             self.set_karma(user, 0)
-        karma = self.db.get(user) 
+        karma = self.db.hget(f"user:{user}", "karma")
         bot.send_message(chat_id=chat.id, text=user+" has "+karma+" karma")
